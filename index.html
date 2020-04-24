@@ -13,7 +13,7 @@
 var checkJump = true;
 var myObstacles;
 var game = false;
-/*function getCookie(cname) {
+function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
@@ -27,8 +27,8 @@ var game = false;
         }
     }
     return "";
-}*/
-//if (getCookie("point") == "") document.cookie = "point=0";
+}
+if (getCookie("point") == "") document.cookie = "point=0";
 function gameStart(){
   myGame.stop();
   myGame.start();
@@ -72,15 +72,12 @@ var myGame = {
     this.context.textAlign = "center";
     this.context.fillText('Press "space" to get start over',this.canvas.width/2,this.canvas.height/2);
     document.cookie = "point="+this.point;
-    console.log(document.cookie);
   },
   countPoint: function () {
     this.point++;
     this.context.font ="30px Arial";
     this.context.textAlign = "end";
-    this.context.fillText(this.point+"/",this.canvas.width-20,30);
-    //document.cookie = "point="+this.point;
-    //console.log(getCookie('point'));
+    this.context.fillText(this.point+"/"+getCookie('pointpoint'),this.canvas.width-20,30);
   }
 }
 function component(width,height,color,x,y) {
@@ -111,7 +108,6 @@ function component(width,height,color,x,y) {
   }
 }
 function updateGame() {
-  //console.log(getCookie('point'));
   myGame.clear();
   myGame.countPoint();
   var len = myObstacles.length;
