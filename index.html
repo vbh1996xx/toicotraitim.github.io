@@ -71,7 +71,7 @@ var myGame = {
     this.context.font ="20px Georgia";
     this.context.textAlign = "center";
     this.context.fillText('Press "space" to get start over',this.canvas.width/2,this.canvas.height/2);
-    document.cookie = "point=2";
+    document.cookie = "point="+this.point;
     console.log(document.cookie);
   },
   countPoint: function () {
