@@ -1,6 +1,23 @@
 var myGame;
 var checkJump = true;
 var myObstacles;
+var game = false;
+/*function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}*/
+//if (getCookie("point") == "") document.cookie = "point=0";
 function gameStart(){
   myGame.stop();
   myGame.start();
@@ -11,6 +28,16 @@ function gameStart(){
 }
 var myGame = {
   canvas: document.createElement("canvas"),
+  wait: function() {
+    this.canvas.width = document.body.clientWidth;
+    this.canvas.height = 270;
+    this.canvas.style.background = "#ddd";
+    this.context = this.canvas.getContext("2d");
+    document.body.insertBefore(this.canvas,document.body.childNodes[0]);
+    this.context.font ="20px Georgia";
+    this.context.textAlign = "center";
+    this.context.fillText('Press "space" to get started',this.canvas.width/2,this.canvas.height/2);
+  },
   start: function (){
     this.canvas.width = document.body.clientWidth;
     this.canvas.height = 270;
@@ -18,16 +45,31 @@ var myGame = {
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas,document.body.childNodes[0]);
     this.interval = setInterval(updateGame, 10);
-    this.speed = 2;
-    this.speedInterval = setInterval(function() {
-      this.speed++;
-    },5000);
+    this.speed = 3;
+    this.point = 0;
+    this.speedInterval = setInterval(speed,5000);
   },
   clear: function() {
     this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
   },
-  stop: function() {
-    clearInterval(this.interval);
+  stop: function(time) {
+    clearInterval(time);
+  },
+  game: function() {
+    game = false;
+    this.context.font ="20px Georgia";
+    this.context.textAlign = "center";
+    this.context.fillText('Press "space" to get start over',this.canvas.width/2,this.canvas.height/2);
+    document.cookie = "point=2";
+    console.log(document.cookie);
+  },
+  countPoint: function () {
+    this.point++;
+    this.context.font ="30px Arial";
+    this.context.textAlign = "end";
+    this.context.fillText(this.point+"/",this.canvas.width-20,30);
+    //document.cookie = "point="+this.point;
+    //console.log(getCookie('point'));
   }
 }
 function component(width,height,color,x,y) {
@@ -41,9 +83,9 @@ function component(width,height,color,x,y) {
     ctx.fillRect(this.x,this.y,this.width,this.height);
   }
   this.newPos = function() {
-    if(this.jump  < this.y) this.y-=2;
+    if(this.jump  < this.y) this.y-=4;
     if(this.jump >= this.y) this.jump = myGame.canvas.height -30;
-    if(this.jump > this.y) this.y+=2;
+    if(this.jump > this.y) this.y+=4;
     if(this.y == myGame.canvas.height -30) checkJump = true;
     else checkJump = false;
   }
@@ -58,15 +100,19 @@ function component(width,height,color,x,y) {
   }
 }
 function updateGame() {
-  console.log(myGame.speed);
+  //console.log(getCookie('point'));
   myGame.clear();
+  myGame.countPoint();
   var len = myObstacles.length;
   if (myObstacles[len-1].x <= myGame.canvas.width/2){
     myObstacles.push(new component(15,100,"red",myGame.canvas.width-20,myGame.canvas.height-(Math.floor(Math.random()*50)+50)));
   }
   for (i = 0; i < len; i++) {
     if (gameDragon.gameOver(myObstacles[i])) {
-      myGame.stop();
+      myGame.stop(myGame.interval);
+      myGame.stop(myGame.speedInterval);
+      myGame.game();
+
     }
     myObstacles[i].x -= myGame.speed;
     myObstacles[i].update();
@@ -74,9 +120,25 @@ function updateGame() {
   gameDragon.newPos();
   gameDragon.update();
 }
+function speed() {
+  myGame.speed++;
+  if (myGame.speed >= 5) {
+    myGame.stop(myGame.speedInterval);
+  }
+}
 function jump() {
-  if (checkJump == true) gameDragon.jump = gameDragon.y - 120;
+  if (checkJump == true) gameDragon.jump = gameDragon.y - 150;
 }
 function newGame() {
   gameStart();
 }
+document.body.onkeypress = function(event) {
+  var key = event.which || event.keyCode;
+  if (key == 32) {
+    if (game == false) {
+      newGame();
+      game = true;
+    }
+    else jump();
+  }
+};
