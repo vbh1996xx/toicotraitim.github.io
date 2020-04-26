@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Circle</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+</style>
+
+<body>
+
+	<script>
+			_reqAnimation = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame;
+			var myGame;
+			var run = true;
+			var jump =  false;
+			var attack = false;
+			var Crun = [];
+			var Cjump = [];
+			window.onload = function() {
+				for (i =1;i <= 10;i++) {
+					Crun[i] = new Image();
+					Crun[i].src = "character/run/"+i+".png";
+				}
+				for (i =1;i <= 10;i++) {
+					Cjump[i] = new Image();
+					Cjump[i].src = "character/jump/"+i+".png";
+				}
+				myGame.start();
+			}
+			var myGame = {
+				canvas: document.createElement("canvas"),
+				start: function() {
+					this.canvas.width = 480;
+					this.canvas.height = 270;
+					this.canvas.style.background = "#ddd";
+					document.body.insertBefore(this.canvas,document.body.childNodes[0]);
+					this.context = this.canvas.getContext('2d');
+					this.character = 1;
+					this.ch = 10;
+					this.interval = setInterval(function() {
+						if(myGame.ch >=  100) {
+							jump = false;
+							attack = false;
+							run = true;
+							myGame.ch = 10;
+						}
+						myGame.ch++;
+						myGame.character = Math.floor(myGame.ch/10);
+
+					},1000/60);
+					this.upd = _reqAnimation(update);
+				},
+				clear: function() {
+					this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+				},
+				clearInterval:  function() {
+					this.character = 1;
+					this.ch = 10;
+					clearInterval(this.interval);
+				}
+			}
+
+			function drawImg(img,x,y) {
+				ctx = myGame.context;
+				ctx.drawImage(img,x,y,150,150);
+			}
+			function update() {
+				myGame.clear();
+				window.onkeypress = function(event) {
+					var key = event.keyCode || event.which;
+					if(key == 32 && jump == false) {
+						jump = true;
+						run = false;
+						myGame.clearInterval();
+						myGame.clear();
+						myGame.interval = setInterval(function() {
+							if(myGame.ch >=  100) {
+								jump = false;
+								attack = false;
+								run = true;
+								myGame.ch = 10;
+							}
+							myGame.ch++;
+							myGame.character = Math.floor(myGame.ch/10);
+
+						},1000/60);
+					}
+				}
+				if (jump == true) {
+					drawImg(Cjump[myGame.character],0,70);
+				}
+				//Crun[myGame.character] = new drawImg(0,100);
+				if (run == true) {
+					drawImg(Crun[myGame.character],0,100);
+				}
+				_reqAnimation(update);
+			}
+	</script>
+</body>
+
+</html>
