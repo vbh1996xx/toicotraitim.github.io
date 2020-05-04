@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Circle</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+</style>
+
+<body>
+
+	<script>
+	_reqAnimation = window.requestAnimationFrame
+	|| window.mozRequestAnimationFrame
+	|| window.webkitRequestAnimationFrame
+	|| window.msRequestAnimationFrame
+	|| window.oRequestAnimationFrame;
+	var w = window.innerWidth
+	|| document.documentElement.clientWidth
+	|| document.body.clientWidth;
+
+	var h = window.innerHeight
+	|| document.documentElement.clientHeight
+	|| document.body.clientHeight;
+	var myGame;
+	var circle = [];
+	var colors = ["#162447","#1f4068","#1b1b2f","#e43f5a","#fcbf1e"];
+	console.log(colors[Math.floor(Math.random()*colors.length)]);
+	window.onload = function () {
+	  myGame.start();
+	  for (i = 0; i < 200; i++) {
+	    circle.push(new Circle(Math.random()*myGame.canvas.width,Math.random()*myGame.canvas.height,Math.random()*2-1,Math.random()*2-1,10,colors[Math.floor(Math.random()*colors.length)]));
+
+	  }
+	};
+	var myGame = {
+	  canvas: document.createElement("canvas"),
+	  start: function () {
+	    this.canvas.width = w;
+	    this.canvas.height = h;
+	    this.context = this.canvas.getContext('2d');
+	    document.body.insertBefore(this.canvas,document.body.childNodes[0]);
+	    this.update = _reqAnimation(updateGame);
+	  }
+	};
+	var mouse = {
+	  x: undefined,
+	  y: undefined
+	};
+	document.body.addEventListener('mousemove',function(event) {
+	  mouse.x = event.x;
+	  mouse.y = event.y;
+	});
+	function Circle(x,y,dx,dy,radian,color) {
+	  this.x = x;
+	  this.y = y;
+	  this.dx = dx;
+	  this.dy = dy;
+	  this.radian = radian;
+	  this.color = color;
+	  this.update = function() {
+	    this.x += dx;
+	    this.y += dy;
+	    if (this.y+this.radian > myGame.canvas.height || this.y-this.radian < 0) dy = -dy;
+	    if (this.x+this.radian > myGame.canvas.width || this.x -this.radian < 0) dx = -dx;
+	    if (this.radian > 50) this.radian = 50;
+	    if (this.y + 50> mouse.y && this.y - 50 < mouse.y && this.x + 50> mouse.x && this.x - 50 < mouse.x) this.radian++;
+	    else if (this.radian > 5) this.radian--;
+	  }
+	  this.draw = function () {
+	    ctx = myGame.context;
+	    ctx.beginPath();
+	    ctx.shadowBlur = 20;
+	    ctx.shadowColor = "black";
+	    ctx.fillStyle = this.color;
+	    ctx.arc(this.x,this.y,this.radian,0,Math.PI*2);
+	    ctx.fill();
+	    ctx.closePath();
+	  }
+	}
+	function updateGame() {
+	  myGame.context.clearRect(0,0,myGame.canvas.width,myGame.canvas.height);
+	  for (i = 0; i < 200; i++) {
+	    circle[i].update();
+	    circle[i].draw();
+	  }
+	  _reqAnimation(updateGame);
+	}
+	</script>
+</body>
+
+</html>
